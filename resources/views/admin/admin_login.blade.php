@@ -1,8 +1,8 @@
-﻿<?php
+﻿{{-- <?php
 if (session()->has('ses_adminid')) {
     echo "<script>window.location='/dashboard';</script>";
 }
-?>
+?> --}}
     <!-- Bootstrap core CSS -->
 <link href="{{ url('admin/css/login/bootstrap.min.css') }}" rel="stylesheet" >
 <link href="{{ url('admin/css/login/font-awesome.min.css') }}" rel="stylesheet" >

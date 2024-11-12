@@ -92,18 +92,73 @@ class PropertyDetailController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(property_detail $property_detail)
+    public function edit($id)
     {
-        return view('admin.edit_propertyDetails');
+        $data = property_detail::find($id);
+        if (!$data) {
+            return redirect()->back()->with('error', 'Property details not found');
+        }
+    
+        $prop_arr = property::all();
+        return view('admin.edit_propertyDetails', ["data" => $data , "prop_arr" => $prop_arr ]);
     }
+    
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, property_detail $property_detail)
+    public function update(Request $request,  $id)
     {
-        //
+        $request->validate([
+            'title' => 'required|string',
+            'location' => 'required|string',
+            'price' => 'required|integer',
+            'description' => 'required|string',
+            'bedrooms' => 'required|integer',
+            'bathrooms' => 'required|integer',
+            'size_sqft' => 'required|integer',
+            'year_built' => 'required|integer',
+            'amenities' => 'nullable|string',
+            'parking' => 'nullable|integer',
+            'floor_number' => 'required|integer',
+            // Add other fields as necessary
+        ]);
+
+        
+        $data = property_detail::find($id);
+
+        $data->property_id = $request->property_id; 
+        $data->title = $request->title;
+        $data->location = $request->location;
+        $data->price = $request->price;
+
+        if($request->hasfile('image_url'))
+        {
+            $old_img=$data->image_url;
+            unlink('admin/img/assets/properties/'.$old_img);
+
+            $file = $request->file('image_url');
+            $filename = time() . '_img.' . $file->getClientOriginalExtension(); // 656676576_img.jpg
+            $file->move('admin/img/assets/properties/', $filename);  // use move for move image in public/images
+            $data->image_url = $filename; // name store in db
+        }  
+       
+
+        $data->description = $request->description;
+        $data->bedrooms = $request->bedrooms;
+        $data->bathrooms = $request->bathrooms;
+        $data->size_sqft = $request->size_sqft;
+        $data->year_built = $request->year_built;
+        $data->amenities = $request->amenities;
+        $data->parking = $request->parking;
+        $data->floor_number = $request->floor_number;
+      
+
+        $data->update();
+        Alert::success('Success Title', 'Property Details Updated Success!');
+        return redirect('/manage_propertyDetails');
     }
+
 
     /**
      * Remove the specified resource from storage.

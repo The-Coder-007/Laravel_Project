@@ -1,6 +1,6 @@
 
 
-<?php
+{{-- <?php
 if (session()->has('ses_adminid')) {
  
 }
@@ -8,7 +8,7 @@ else
 {
     echo "<script>window.location='/admins';</script>";
 }
-?>
+?> --}}
 
 <!DOCTYPE html>
 <html lang="en">

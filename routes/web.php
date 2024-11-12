@@ -7,6 +7,8 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyDetailController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CrowselController;
+use App\Http\Middleware\admin_afterLogin;
+use App\Http\Middleware\admin_beforLogin;
 
 Route::get('/', [PropertyController::class, 'home']);
 
@@ -46,50 +48,61 @@ Route::get('/prop_details', [PropertyDetailController::class, 'index']);
 
 // ======== Admin Start =======
 
-Route::get('/admins', [AdminController::class, 'create']);
-Route::post('/admin_login', [AdminController::class, 'admin_login']);
-Route::get('/admin_logout', [AdminController::class, 'admin_logout']);
+Route::get('/admins', [AdminController::class, 'create'])->middleware('admin_after');
+Route::post('/admin_login', [AdminController::class, 'admin_login'])->middleware('admin_after');
 
 
-Route::get('/dashboard', [AdminController::class, 'dash']);
 
-Route::get('/dbtable', function () {
-    return view('admin.datatables');
+Route::middleware(['admin_befor'])->group(function () {
+    
+    Route::get('/admin_logout', [AdminController::class, 'admin_logout']);
+
+    Route::get('/dashboard', [AdminController::class, 'dash']);
+
+    Route::get('/dbtable', function () {
+        return view('admin.datatables');
+    });
+    Route::get('/table', function () {
+        return view('admin.tables');
+    });
+    Route::get('/starter', function () {
+        return view('admin.starter-template');
+    });
+
+    Route::get('/forms', function () {
+        return view('admin.forms');
+    });
+
+
+    // manage
+    Route::get('/manage_propertyDetails', [PropertyDetailController::class, 'create']);
+    Route::get('/manage_property', [PropertyController::class, 'manage']);
+    Route::get('/manage_crowsel', [CrowselController::class, 'index']);
+
+
+    // add
+
+    Route::get('/add_croswel', [CrowselController::class, 'create']);
+
+    Route::get('/add_property', [PropertyController::class, 'create']);
+    Route::post('/add_property', [PropertyController:: class, 'store']);  
+
+    Route::get('/add_propertyDetails', [PropertyDetailController::class, 'show']);  
+    Route::post('/add_propertyDetails', [PropertyDetailController::class, 'store']);  
+
+
+    //edit
+
+    // Route::get('/edit_propertyDetails', [PropertyController::class, 'edit']);
+    Route::get('/edit_propertyDetails/{id}', [PropertyDetailController::class, 'edit'])->name('edit_propertyDetails');
+    Route::post('/update_propertyDetails/{id}', [PropertyDetailController::class, 'update'])->name('update_propertyDetails');
+
+
+
+    // Delete
+
+    Route::get('/delete_property/{id}', [PropertyController::class, 'destroy']);
+    Route::get('/delete_propertyDetails/{id}', [PropertyDetailController::class, 'destroy']); 
+
+
 });
-Route::get('/table', function () {
-    return view('admin.tables');
-});
-Route::get('/starter', function () {
-    return view('admin.starter-template');
-});
-
-Route::get('/forms', function () {
-    return view('admin.forms');
-});
-
-
-// manage
-Route::get('/manage_propertyDetails', [PropertyDetailController::class, 'create']);
-Route::get('/manage_property', [PropertyController::class, 'manage']);
-Route::get('/manage_crowsel', [CrowselController::class, 'index']);
-
-
-// add
-
-Route::get('/add_croswel', [CrowselController::class, 'create']);
-
-Route::get('/add_property', [PropertyController::class, 'create']);
-Route::post('/add_property', [PropertyController:: class, 'store']);  
-
-Route::get('/add_propertyDetails', [PropertyDetailController::class, 'show']);  
-Route::post('/add_propertyDetails', [PropertyDetailController::class, 'store']);  
-
-
-//edit
-
-Route::get('/edit_propertyDetails', [PropertyController::class, 'edit']);
-
-// Delete
-
-Route::get('/delete_property/{id}', [PropertyController::class, 'destroy']);
-Route::get('/delete_propertyDetails/{id}', [PropertyDetailController::class, 'destroy']);
